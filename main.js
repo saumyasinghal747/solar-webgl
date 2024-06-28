@@ -1,17 +1,35 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-const controls = new OrbitControls( camera, renderer.domElement );
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({logarithmicDepthBuffer: true, antialias: true});
 
 
-//const stars = new THREE.TextureLoader().load("/8k_stars_milky_way.jpg")
+var ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
+
+var bloomLayer = new THREE.Layers();
+bloomLayer.set( BLOOM_SCENE );
+
+var params = {
+    exposure: 1,
+    bloomStrength: 1,
+    bloomThreshold: 0,
+    bloomRadius: 0,
+    scene: "Scene Only" //"Scene with Glow"
+};
+
+var darkMaterial = new THREE.MeshPhongMaterial( { color: "black" } );
+var materials = {};
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 
 //** TEXTURES */
@@ -113,10 +131,130 @@ scene.add(
 
 camera.position.set(0, 0, earthRadius*(1+elevationScale+0.5));
 controls.update();
+
+
+
+const renderScene = new RenderPass( scene, camera );
+
+const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+bloomPass.threshold = params.bloomThreshold;
+bloomPass.strength = params.bloomStrength;
+bloomPass.radius = params.bloomRadius;
+
+const outputPass = new OutputPass();
+//composer.addPass( outputPass );
+
+const bloomComposer = new EffectComposer( renderer );
+bloomComposer.renderToScreen = false;
+bloomComposer.addPass( renderScene );
+bloomComposer.addPass( bloomPass );
+
+var finalPass = new ShaderPass(
+    new THREE.ShaderMaterial( {
+        //map: null,
+        uniforms: {
+            baseTexture: { value: null },
+            bloomTexture: { value: bloomComposer.renderTarget2.texture }
+        },
+        vertexShader: document.getElementById( 'vertexshader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+        defines: {
+        }
+    } ), "baseTexture"
+);
+finalPass.needsSwap = true;
+
+var finalComposer = new EffectComposer( renderer );
+finalComposer.addPass( renderScene );
+finalComposer.addPass( finalPass );
+
+window.onresize = function () {
+
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( width, height );
+
+    bloomComposer.setSize( width, height );
+    finalComposer.setSize( width, height );
+
+    render();
+
+};
+
+
+function render() {
+
+    switch ( params.scene ) {
+
+        case 'Scene only':
+            renderer.render( scene, camera );
+            break;
+        case 'Glow only':
+            renderBloom( false );
+            break;
+        case 'Scene with Glow':
+        default:
+            // render scene with bloom
+            renderBloom( true );
+
+            // render the entire scene, then render bloom scene on top
+            finalComposer.render();
+            break;
+
+    }
+
+}
+
+
+function renderBloom( mask ) {
+
+    if ( mask === true ) {
+
+        scene.traverse( darkenNonBloomed );
+        bloomComposer.render();
+        scene.traverse( restoreMaterial );
+
+    } else {
+
+        camera.layers.set( BLOOM_SCENE );
+        bloomComposer.render();
+        camera.layers.set( ENTIRE_SCENE );
+
+    }
+
+}
+
+function darkenNonBloomed( obj ) {
+
+    if ( obj.isMesh && bloomLayer.test( obj.layers ) === false ) {
+
+        materials[ obj.uuid ] = obj.material;
+        obj.material = darkMaterial;
+
+    }
+
+}
+
+function restoreMaterial( obj ) {
+
+    if ( materials[ obj.uuid ] ) {
+
+        obj.material = materials[ obj.uuid ];
+        delete materials[ obj.uuid ];
+
+    }
+
+}
+
 function animate() {
     requestAnimationFrame(animate)
     //earth.rotation.x += 0.000001;
-    //earth.rotation.y += 0.001;
-	renderer.render( scene, camera );
+    earth.rotation.y += 0.001;
+    clouds.rotation.y += 0.001;
+    render()
 }
 requestAnimationFrame(animate)
