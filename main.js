@@ -35,15 +35,15 @@ const controls = new OrbitControls(camera, renderer.domElement);
 //** TEXTURES */
 
 //const stars = new THREE.TextureLoader().load("/8k_stars_milky_way.jpg")
-const earthTexture = new THREE.TextureLoader().load("/8k_earth_daymap.jpg");
-const earthNormalTexture = new THREE.TextureLoader().load("/8k_earth_normal_map.tif")
-const earthDisplaceTexture = new THREE.TextureLoader().load("/gebco_bathy.5400x2700_8bit.jpg")
-const earthSpecTexture = new THREE.TextureLoader().load("/8k_earth_specular_map.tif")
-const nightTexture = new THREE.TextureLoader().load("/8k_earth_nightmap.jpg")
-const cloudsTexture = new THREE.TextureLoader().load("/8k_earth_clouds.jpg")
+const earthTexture = new THREE.TextureLoader().load("./8k_earth_daymap.jpg");
+const earthNormalTexture = new THREE.TextureLoader().load("./8k_earth_normal_map.tif")
+const earthDisplaceTexture = new THREE.TextureLoader().load("./gebco_bathy.5400x2700_8bit.jpg")
+const earthSpecTexture = new THREE.TextureLoader().load("./8k_earth_specular_map.tif")
+const nightTexture = new THREE.TextureLoader().load("./8k_earth_nightmap.jpg")
+const cloudsTexture = new THREE.TextureLoader().load("./8k_earth_clouds.jpg")
 
-const sunTexture = new THREE.TextureLoader().load("/8k_sun.jpg")
-const moonTexture = new THREE.TextureLoader().load("/8k_moon.jpg")
+const sunTexture = new THREE.TextureLoader().load("./8k_sun.jpg")
+const moonTexture = new THREE.TextureLoader().load("./8k_moon.jpg")
 
 //** CONSTANTS (KM) */
 
@@ -72,7 +72,7 @@ const earthMat = new THREE.MeshPhongMaterial({
  });
 
 const earth = new THREE.Mesh(earthGeo, earthMat);
-earth.layers.enable(BLOOM_SCENE)
+//earth.layers.enable(BLOOM_SCENE)
 //earth.receiveShadow = true
 //earth.castShadow = true
 
@@ -113,7 +113,7 @@ const sunMat = new THREE.MeshStandardMaterial({
 const sun = new THREE.Mesh(sunGeo, sunMat)
 sun.position.set(-sunDistance, -sunDistance, sunDistance)
 
-const sunlight = new THREE.DirectionalLight(0xffffff, 0.7);
+const sunlight = new THREE.DirectionalLight(0xffffff, 1);
 //sunlight.castShadow = true;
 sunlight.position.set(-sunDistance, -sunDistance, sunDistance)
 
@@ -123,7 +123,7 @@ scene.add(
     //ocean,
     sunlight,
     sun,
-    //clouds
+    clouds
         //new THREE.AmbientLight()
 );
 
@@ -252,7 +252,7 @@ function restoreMaterial( obj ) {
 
 function animate() {
     requestAnimationFrame(animate)
-    //earth.rotation.x += 0.000001;
+    
     earth.rotation.y += 0.001;
     clouds.rotation.y += 0.001;
     render()
