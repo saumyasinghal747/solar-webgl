@@ -17,15 +17,15 @@ const controls = new OrbitControls( camera, renderer.domElement );
 //** TEXTURES */
 
 //const stars = new THREE.TextureLoader().load("/8k_stars_milky_way.jpg")
-const earthTexture = new THREE.TextureLoader().load("/8k_earth_daymap.jpg");
-const earthNormalTexture = new THREE.TextureLoader().load("/8k_earth_normal_map.tif")
-const earthDisplaceTexture = new THREE.TextureLoader().load("/gebco_bathy.5400x2700_8bit.jpg")
-const earthSpecTexture = new THREE.TextureLoader().load("/8k_earth_specular_map.tif")
-const nightTexture = new THREE.TextureLoader().load("/8k_earth_nightmap.jpg")
-const cloudsTexture = new THREE.TextureLoader().load("/8k_earth_clouds.jpg")
+const earthTexture = new THREE.TextureLoader().load("./8k_earth_daymap.jpg");
+const earthNormalTexture = new THREE.TextureLoader().load("./8k_earth_normal_map.tif")
+const earthDisplaceTexture = new THREE.TextureLoader().load("./gebco_bathy.5400x2700_8bit.jpg")
+const earthSpecTexture = new THREE.TextureLoader().load("./8k_earth_specular_map.tif")
+const nightTexture = new THREE.TextureLoader().load("./8k_earth_nightmap.jpg")
+const cloudsTexture = new THREE.TextureLoader().load("./8k_earth_clouds.jpg")
 
-const sunTexture = new THREE.TextureLoader().load("/8k_sun.jpg")
-const moonTexture = new THREE.TextureLoader().load("/8k_moon.jpg")
+const sunTexture = new THREE.TextureLoader().load("./8k_sun.jpg")
+const moonTexture = new THREE.TextureLoader().load("./8k_moon.jpg")
 
 //** CONSTANTS (KM) */
 
