@@ -54,7 +54,7 @@ const earthMat = new THREE.MeshPhongMaterial({
  });
 
 const earth = new THREE.Mesh(earthGeo, earthMat);
-earth.layers.enable(BLOOM_SCENE)
+//earth.layers.enable(BLOOM_SCENE)
 //earth.receiveShadow = true
 //earth.castShadow = true
 
