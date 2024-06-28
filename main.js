@@ -95,7 +95,7 @@ const sunMat = new THREE.MeshStandardMaterial({
 const sun = new THREE.Mesh(sunGeo, sunMat)
 sun.position.set(-sunDistance, -sunDistance, sunDistance)
 
-const sunlight = new THREE.DirectionalLight(0xffffff, 0.7);
+const sunlight = new THREE.DirectionalLight(0xffffff, 1);
 //sunlight.castShadow = true;
 sunlight.position.set(-sunDistance, -sunDistance, sunDistance)
 
@@ -105,7 +105,7 @@ scene.add(
     //ocean,
     sunlight,
     sun,
-    //clouds
+    clouds
         //new THREE.AmbientLight()
 );
 
@@ -115,8 +115,9 @@ camera.position.set(0, 0, earthRadius*(1+elevationScale+0.5));
 controls.update();
 function animate() {
     requestAnimationFrame(animate)
-    //earth.rotation.x += 0.000001;
-    //earth.rotation.y += 0.001;
+
+    earth.rotation.y += 0.001;
+    clouds.rotation.y += 0.001;
 	renderer.render( scene, camera );
 }
 requestAnimationFrame(animate)
